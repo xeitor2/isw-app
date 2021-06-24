@@ -5,7 +5,7 @@ node {
         checkout scm
     }
 
-    docker.image('jhipster/jhipster:v7.0.1').inside('-u jhipster -e MAVEN_OPTS="-Duser.home=./"') {
+    docker.image('jhipster/jhipster:v7.0.1').inside('-u root -e MAVEN_OPTS="-Duser.home=./"') {
         stage('check java') {
             sh "java -version"
         }
@@ -23,7 +23,7 @@ node {
         }
 
         stage('npm install') {
-            sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:npm"
+            sh "./mvnw -X -ntp com.github.eirslett:frontend-maven-plugin:npm"
         }
         stage('backend tests') {
             try {
@@ -32,17 +32,6 @@ node {
                 throw err
             } finally {
                 junit '**/target/surefire-reports/TEST-*.xml,**/target/failsafe-reports/TEST-*.xml'
-            }
-        }
-
-        stage('frontend tests') {
-            try {
-               sh "npm install"
-               sh "npm test"
-            } catch(err) {
-                throw err
-            } finally {
-                junit '**/target/test-results/TESTS-results-jest.xml'
             }
         }
 
